@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Content Summarizer</title>
+    <style>
+        /* Your existing CSS styles here */
+        body {
+            background-color: #ffffff;
+            font-family: Arial, sans-serif;
+            color: #000000;
+            font-size: 13;
+        }
+        
+        .container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px;
+            padding: 20px;
+            background-color:lightyellow;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px black;
+        }
+
+        .left-container {
+            flex: 1;
+            margin-right: 20px;
+            border: 2px solid #3343;
+            padding: 14px;
+            border-radius: 10px;
+            
+        }
+
+        .right-container {
+            flex: 1;
+            margin-left: 30px;
+            max-height: 400px;
+            background-color: #fff;
+            border: 2px solid #3343;
+            border-radius: 10px;
+            box-shadow: inset 0px 0px 5px black;
+        }
+
+        .NumberOfSentence{
+            box-shadow: inset 0px 0px 5px black;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        textarea,
+        input[type="number"] {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .Hausa_text{ 
+            flex: 1;
+            margin-right: 20px;
+            border: 2px solid #3343;
+            padding: 14px;
+            border-radius: 10px;
+
+             }
+        .choose_language{ 
+            flex: 1;
+            margin-right: 20px;
+            border: 2px solid #3343;
+            padding: 14px;
+            border-radius: 10px;
+        }
+        .txtArea{
+            margin-top: 5px;
+            box-shadow: inset 0px 0px 5px black;
+        }
+        .select{
+            position: fixed;
+            padding: 10px;
+            border: 1px solid;
+
+        }
+        #demo{
+            outline: none;
+            box-shadow: inset 0px 0px 5px black;
+            width: 90%;
+            margin: auto;
+            padding: 3rem;
+            line-height: 1.8;
+        }
+
+        .local{
+            width: 40%;
+            height: 70px;
+            scrollbar-width: 10px;
+            padding: 17px;
+            line-height: 1.15;
+
+        }
+        .class{
+            margin-top: auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3rem;
+            color: #007BFF;
+        }
+
+        button {
+            background-color:rgb(10, 93, 120);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color:rgb(149, 180, 190);
+            color:black;
+        }
+
+        h2 {
+            color: #c8e3ff;
+        }
+
+        .right-container p {
+            padding: 14px;
+            line-height: 1.5;
+            background-color: transparent;
+        }
+
+        .loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+        .translate{
+            //display: flex;
+            //justify-content: center;
+            margin: 20px;
+            padding: 20px;
+            background-color:lightyellow;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px black;
+            align-content:center;
+        }
+
+        .loader p {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+        .textcontainer{
+            overflow-y: scroll;
+            height: 350px;
+        }
+        .printer{
+            display: flex;
+        
+        }
+        .printer button{
+            margin-left: 10px;
+            
+        }
+        @keyframes loaderAnimation {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loader .spinner {
+            border: 8px solid #002042;
+            border-top: 8px solid #f0f0f0;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: loaderAnimation 2s linear infinite;
+        }
+    </style>
+</head>
+
+<body class="structure">
+    <div class="header" style="background:rgb(10, 93, 120); padding: 0.5rem;">
+        <h1 style="color:#ffffff;font-weight: bold;text-align:center; ">ENGLISH TO HAUSA SUMMARIZER AND TRANSLATOR USING SEQ TO SEQ </h1>
+    </div>
+    <div class="container">
+        <div class="left-container">
+            <form method="POST" onsubmit="showLoader()">
+                <label for="text">
+                    <h4>INPUT YOUR TEXT</h4>
+                </label>
+ 
+                <textarea  class="txtArea" name="text" rows="10" required></textarea>
+                <!-- <label for="num_sentences">NUMBER OF SENTENCE</label> -->
+                <input class="NumberOfSentence" type="number" value="5" name="num_sentences" required style="display: none">
+                <button type="submit">SUMMARIZE</button>
+            </form>
+        </div>
+        <div class="right-container">
+            <div class="textcontainer" id="summarize">
+                {% if summary %}
+                <h2>Summary:</h2>
+                <p id="summary">{{ summary }}</p>
+            </div>
+            <div class="printer">
+                <form>
+                    <input type="hidden" name="summary" value="{{ summary }}">
+                </form>
+                <button onclick="printSummary()">Print</button>
+                {% endif %}
+            </div>
+        </div>
+        </div>
+        <div class="loader" id="loader">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+        </div>
+<!-- Translator section -->
+    <div id="demo" style=""></div>
+    <div style="text-align: center; margin-top: 15px;">
+
+        <button onclick="translateText()">Translate</button>
+    </div>
+
+
+            </div><br>
+        <!--To here thats is the end of the work-->
+        <div class="footer" style="background:rgb(10, 93, 120); height:70px">
+            <div width="90%" align="center"><br>
+                <h2 style="color: #ffe5e5; font-size: 200%; font-weight: bold; ">DESIGN BY: U/CS/20/024 MOHAMMED ADAMU ADAM  UNDER
+                    SUPERVISION OF: MALAM MUSA WAKIL BARA &copy;2024</h2>
+            </div>
+        </div>
+        <script>
+            function showLoader() {
+                document.getElementById("loader").style.display = "flex";
+                setTimeout(hideLoader, 5000);
+            }
+            function hideLoader() {
+                document.getElementById("loader").style.display = "none";
+            }
+            function printSummary() {
+                const summary = document.getElementById("summary").innerText;
+                const printWindow = window.open('', '', 'height=400,width=800, text=justify');
+                printWindow.document.write('<html><head><title>Summary</title>');
+                printWindow.document.write('</head><body>');
+                printWindow.document.write('<h2>Summary:</h2>');
+                printWindow.document.write('<p>' + summary + '</p>');
+                printWindow.document.write('</body></html>');
+                printWindow.document.close();
+                printWindow.print();
+            }
+            //Area of language translator
+
+            function translateText() {
+            const summary = document.getElementById('summary').innerText;
+
+            const url = 'https://google-translator9.p.rapidapi.com/v2';
+            const options = {
+                method: 'POST',
+                headers: {
+                    'x-rapidapi-key': '24d3bd3e13msh60ce28316edf923p11ff29jsn017577e2fbc4',
+                    'x-rapidapi-host': 'google-translator9.p.rapidapi.com',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    q: summary,
+                    source: 'en',
+                    target: 'ha',
+                    format: 'text'
+                })
+            };
+
+            async function fetchData() {
+                try {
+                    const response = await fetch(url, options);
+                    const data = await response.json();
+                    const translatedText = data.data.translations[0].translatedText;
+                    console.log(translatedText);
+                    document.getElementById('demo').textContent = translatedText;
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+
+            fetchData();
+        }
+          //End of language translator
+        </script>
+</body>
+
+</html>
